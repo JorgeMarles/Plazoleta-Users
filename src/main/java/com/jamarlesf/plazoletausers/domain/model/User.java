@@ -20,7 +20,7 @@ public class User {
     private LocalDate birthDate;
     private String email;
     private String password;
-    private Role rol;
+    private Role role;
 
     private void validateEmail(String email) {
         if (email == null || !email.matches("^[\\w._%+\\-]+@[\\w.\\-]+\\.[a-zA-Z]{2,}$"))
