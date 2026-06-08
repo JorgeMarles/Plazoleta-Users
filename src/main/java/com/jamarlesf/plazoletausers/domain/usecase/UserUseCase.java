@@ -9,6 +9,8 @@ import com.jamarlesf.plazoletausers.domain.spi.IEncryptionPort;
 import com.jamarlesf.plazoletausers.domain.spi.IRolePersistencePort;
 import com.jamarlesf.plazoletausers.domain.spi.IUserPersistencePort;
 
+import java.util.List;
+
 public class UserUseCase implements IUserServicePort {
 
     private final IUserPersistencePort userPersistencePort;
@@ -33,5 +35,10 @@ public class UserUseCase implements IUserServicePort {
         user.setRole(role);
         user.setPassword(encryptionPort.encryptPassword(user.getPassword()));
         userPersistencePort.save(user);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userPersistencePort.findAll();
     }
 }

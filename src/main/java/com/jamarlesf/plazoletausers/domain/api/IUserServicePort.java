@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface IUserServicePort {
     void save(User user);
+    List<User> findAll();
 }
