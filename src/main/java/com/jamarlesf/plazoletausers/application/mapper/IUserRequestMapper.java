@@ -8,7 +8,7 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(
         componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        unmappedSourcePolicy = ReportingPolicy.WARN
+        unmappedSourcePolicy = ReportingPolicy.IGNORE
 )
 public interface IUserRequestMapper {
     User toUser(UserRequestDto userRequestDto);
