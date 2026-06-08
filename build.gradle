@@ -56,4 +56,5 @@ tasks.named('test') {
 
 test {
 	finalizedBy jacocoTestReport
+	jvmArgs '-XX:+EnableDynamicAgentLoading'
 }
