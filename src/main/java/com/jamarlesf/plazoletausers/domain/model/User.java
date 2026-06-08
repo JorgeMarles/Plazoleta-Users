@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.Period;
 
@@ -37,26 +38,20 @@ public class User {
             throw new DomainException("El documento de identidad debe ser únicamente numérico");
     }
 
-    private void validateAdult(LocalDate birthDate) {
-        if (birthDate == null || Period.between(birthDate, LocalDate.now()).getYears() < 18)
+    private void validateAdult(LocalDate birthDate, Clock clock) {
+        if (birthDate == null || Period.between(birthDate, LocalDate.now(clock)).getYears() < 18)
             throw new DomainException("El usuario debe ser mayor de edad");
     }
 
-    private User validate() {
+    public void validate(Clock clock) {
         validateEmail(this.email);
         validatePhone(this.phone);
         validateDocumentId(this.documentId);
-        validateAdult(this.birthDate);
-        return this;
+        validateAdult(this.birthDate, clock);
     }
 
-    public static UserBuilder builder() {
-        return new UserBuilder() {
-            @Override
-            public User build() {
-                return super.build().validate();
-            }
-        };
+    public void validate() {
+        validate(Clock.systemDefaultZone());
     }
 
 }

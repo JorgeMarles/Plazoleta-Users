@@ -25,6 +25,7 @@ public class UserUseCase implements IUserServicePort {
 
     @Override
     public void save(User user) {
+        user.validate();
         if (userPersistencePort.existsByEmail(user.getEmail())) {
             throw new UserEmailAlreadyExistsException();
         }
