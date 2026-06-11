@@ -1,0 +1,566 @@
+# Instincts generated from https://github.com/JorgeMarles/Plazoleta-Users
+# Generated: 2026-06-11T01:14:43.575Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: Plazoleta-Users-commit-conventional
+trigger: "when writing a commit message"
+confidence: 0.85
+domain: git
+source: repo-analysis
+source_repo: https://github.com/JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Commit Conventional
+
+## Action
+
+Use conventional commit format with prefixes: feat, chore, fix
+
+## Evidence
+
+- 26 commits analyzed
+- Detected conventional commit pattern
+- Examples: chore(domain): User and Role model, feat(domain): Password Encryption
+
+---
+id: Plazoleta-Users-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Commit Length
+
+## Action
+
+Keep commit messages concise (~44 characters)
+
+## Evidence
+
+- Average commit message length: 44 chars
+- Based on 26 commits
+
+---
+id: Plazoleta-Users-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Naming Files
+
+## Action
+
+Use PascalCase naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: PascalCase
+
+---
+id: Plazoleta-Users-import-relative
+trigger: "when importing modules"
+confidence: 0.75
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Import Relative
+
+## Action
+
+Use relative imports for project files
+
+## Evidence
+
+- Import analysis shows relative import pattern
+- Example: import { x } from '../lib/x'
+
+---
+id: Plazoleta-Users-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Export Style
+
+## Action
+
+Prefer named exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: named
+
+---
+id: Plazoleta-Users-test-colocate
+trigger: "when writing tests"
+confidence: 0.85
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Test Colocate
+
+## Action
+
+Place test file next to the source file (e.g., Button.test.tsx next to Button.tsx)
+
+## Evidence
+
+- Colocated test pattern detected
+- Tests live alongside source files
+
+---
+id: Plazoleta-Users-test-naming
+trigger: "when creating a test file"
+confidence: 0.85
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Test Naming
+
+## Action
+
+Name test files using the pattern: *.test.ts
+
+## Evidence
+
+- File pattern: *.test.ts
+- Consistent across test files
+
+---
+id: Plazoleta-Users-workflow-feature-development
+trigger: "when implementing a new feature"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Workflow Feature Development
+
+## Action
+
+Follow the feature-development workflow:
+1. Add feature implementation
+2. Add tests for feature
+3. Update documentation
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~17x per month
+- Files: **/*.test.*, **/api/**
+
+---
+id: Plazoleta-Users-workflow-add-new-domain-feature
+trigger: "when doing add new domain feature"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Workflow Add New Domain Feature
+
+## Action
+
+Follow the add-new-domain-feature workflow:
+1. Create or update domain models in domain/model/
+2. Add or update exceptions in domain/exception/
+3. Define service and/or persistence ports in domain/api/ and domain/spi/
+4. Implement use case logic in domain/usecase/
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: src/main/java/com/jamarlesf/plazoletausers/domain/model/*.java, src/main/java/com/jamarlesf/plazoletausers/domain/exception/*.java, src/main/java/com/jamarlesf/plazoletausers/domain/api/*.java
+
+---
+id: Plazoleta-Users-workflow-add-application-layer-support
+trigger: "when doing add application layer support"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Workflow Add Application Layer Support
+
+## Action
+
+Follow the add-application-layer-support workflow:
+1. Create or update DTOs in application/dto/request/ and application/dto/response/
+2. Create or update mappers in application/mapper/
+3. Add or update handlers in application/handler/ and application/handler/impl/
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: src/main/java/com/jamarlesf/plazoletausers/application/dto/request/*.java, src/main/java/com/jamarlesf/plazoletausers/application/dto/response/*.java, src/main/java/com/jamarlesf/plazoletausers/application/mapper/*.java
+
+---
+id: Plazoleta-Users-workflow-add-infrastructure-persistence-layer
+trigger: "when doing add infrastructure persistence layer"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Workflow Add Infrastructure Persistence Layer
+
+## Action
+
+Follow the add-infrastructure-persistence-layer workflow:
+1. Create or update JPA entities in infrastructure/out/jpa/entity/
+2. Create or update repositories in infrastructure/out/jpa/repository/
+3. Create or update entity mappers in infrastructure/out/jpa/mapper/
+4. Implement or update adapters in infrastructure/out/jpa/adapter/
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: src/main/java/com/jamarlesf/plazoletausers/infrastructure/out/jpa/entity/*.java, src/main/java/com/jamarlesf/plazoletausers/infrastructure/out/jpa/repository/*.java, src/main/java/com/jamarlesf/plazoletausers/infrastructure/out/jpa/mapper/*.java
+
+---
+id: Plazoleta-Users-workflow-add-or-update-controller-and-exception-handling
+trigger: "when doing add or update controller and exception handling"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Workflow Add Or Update Controller And Exception Handling
+
+## Action
+
+Follow the add-or-update-controller-and-exception-handling workflow:
+1. Create or update REST controllers in infrastructure/input/rest/
+2. Create or update ControllerAdvisor in infrastructure/exceptionhandler/
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: src/main/java/com/jamarlesf/plazoletausers/infrastructure/input/rest/*.java, src/main/java/com/jamarlesf/plazoletausers/infrastructure/exceptionhandler/*.java
+
+---
+id: Plazoleta-Users-workflow-add-or-update-tests
+trigger: "when doing add or update tests"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Workflow Add Or Update Tests
+
+## Action
+
+Follow the add-or-update-tests workflow:
+1. Create or update test files in src/test/java/com/jamarlesf/plazoletausers/domain/
+2. Optionally update build.gradle for test configuration
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: src/test/java/com/jamarlesf/plazoletausers/domain/**/*.java, build.gradle
+
+---
+id: plazoleta-users-instinct-class-naming
+trigger: "When creating a new Java class file"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Instinct Class Naming
+
+## Action
+
+Name the file and class using PascalCase
+
+## Evidence
+
+- Pattern in namingConventions.files: PascalCase
+- Pattern in namingConventions.classes: PascalCase
+
+---
+id: plazoleta-users-instinct-function-naming
+trigger: "When defining a new function or method"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Instinct Function Naming
+
+## Action
+
+Use camelCase for function and method names
+
+## Evidence
+
+- Pattern in namingConventions.functions: camelCase
+
+---
+id: plazoleta-users-instinct-constant-naming
+trigger: "When defining a constant"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Instinct Constant Naming
+
+## Action
+
+Use SCREAMING_SNAKE_CASE for constant names
+
+## Evidence
+
+- Pattern in namingConventions.constants: SCREAMING_SNAKE_CASE
+
+---
+id: plazoleta-users-instinct-import-style
+trigger: "When importing modules or classes"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Instinct Import Style
+
+## Action
+
+Use relative imports
+
+## Evidence
+
+- Pattern in importStyle: relative
+
+---
+id: plazoleta-users-instinct-export-style
+trigger: "When exporting modules or classes"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Instinct Export Style
+
+## Action
+
+Use named exports
+
+## Evidence
+
+- Pattern in exportStyle: named
+
+---
+id: plazoleta-users-instinct-test-location
+trigger: "When adding or updating tests"
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Instinct Test Location
+
+## Action
+
+Place test files in src/test/java/com/jamarlesf/plazoletausers/domain/
+
+## Evidence
+
+- Pattern in architecture.folderStructure.testLocation: colocated
+- Pattern in add-or-update-tests.filesInvolved
+
+---
+id: plazoleta-users-instinct-test-type
+trigger: "When writing tests for domain or application logic"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Instinct Test Type
+
+## Action
+
+Write unit tests
+
+## Evidence
+
+- Pattern in testing.testTypes: unit
+
+---
+id: plazoleta-users-instinct-commit-format
+trigger: "When making a git commit"
+confidence: 0.9
+domain: git
+source: repo-analysis
+source_repo: JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Instinct Commit Format
+
+## Action
+
+Use conventional commit format: <type>(<scope>): <description>, where type is feat, fix, or chore
+
+## Evidence
+
+- Pattern in commits.type: conventional
+- Pattern in commits.prefixes: [feat, chore, fix]
+- Seen in commit: 'feat(domain): Password Encryption'
+
+---
+id: plazoleta-users-instinct-commit-length
+trigger: "When writing a commit message"
+confidence: 0.7
+domain: git
+source: repo-analysis
+source_repo: JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Instinct Commit Length
+
+## Action
+
+Keep commit message length around 44 characters on average
+
+## Evidence
+
+- Pattern in commits.averageLength: 44
+
+---
+id: plazoleta-users-instinct-add-new-domain-feature
+trigger: "When introducing a new business concept or capability in the domain layer"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Instinct Add New Domain Feature
+
+## Action
+
+Create or update domain models, exceptions, ports, and use cases in the respective domain folders
+
+## Evidence
+
+- Workflow: add-new-domain-feature
+- Pattern in add-new-domain-feature.filesInvolved
+
+---
+id: plazoleta-users-instinct-add-application-layer-support
+trigger: "When exposing new or updated domain features to the application layer"
+confidence: 0.85
+domain: workflow
+source: repo-analysis
+source_repo: JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Instinct Add Application Layer Support
+
+## Action
+
+Create or update DTOs, mappers, and handlers in the application layer folders
+
+## Evidence
+
+- Workflow: add-application-layer-support
+- Pattern in add-application-layer-support.filesInvolved
+
+---
+id: plazoleta-users-instinct-add-infrastructure-persistence-layer
+trigger: "When persisting new or updated domain models in the database"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Instinct Add Infrastructure Persistence Layer
+
+## Action
+
+Create or update JPA entities, repositories, mappers, and adapters in the infrastructure/out/jpa folders
+
+## Evidence
+
+- Workflow: add-infrastructure-persistence-layer
+- Pattern in add-infrastructure-persistence-layer.filesInvolved
+
+---
+id: plazoleta-users-instinct-add-or-update-controller-and-exception-handling
+trigger: "When exposing new endpoints or improving error handling at the API layer"
+confidence: 0.85
+domain: workflow
+source: repo-analysis
+source_repo: JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Instinct Add Or Update Controller And Exception Handling
+
+## Action
+
+Create or update REST controllers and ControllerAdvisor in the infrastructure/input/rest and infrastructure/exceptionhandler folders
+
+## Evidence
+
+- Workflow: add-or-update-controller-and-exception-handling
+- Pattern in add-or-update-controller-and-exception-handling.filesInvolved
+
+---
+id: plazoleta-users-instinct-add-or-update-tests
+trigger: "When adding new logic or fixing bugs in the domain or application layers"
+confidence: 0.8
+domain: workflow
+source: repo-analysis
+source_repo: JorgeMarles/Plazoleta-Users
+---
+
+# Plazoleta Users Instinct Add Or Update Tests
+
+## Action
+
+Create or update test files in src/test/java/com/jamarlesf/plazoletausers/domain/ and optionally update build.gradle
+
+## Evidence
+
+- Workflow: add-or-update-tests
+- Pattern in add-or-update-tests.filesInvolved
+
