@@ -34,7 +34,7 @@ public class UserEntity {
     @Column(name = "surname")
     private String surname;
 
-    @Column(name = "document_id", unique = true)
+    @Column(name = "document_id")
     private String documentId;
 
     @Column(name = "phone")
