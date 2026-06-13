@@ -2,6 +2,7 @@ package com.jamarlesf.plazoletausers.infrastructure.exceptionhandler;
 
 import com.jamarlesf.plazoletausers.domain.exception.DomainException;
 import com.jamarlesf.plazoletausers.domain.exception.RoleNotFoundException;
+import com.jamarlesf.plazoletausers.infrastructure.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -16,6 +17,11 @@ public class ControllerAdvisor {
 
     @ExceptionHandler(RoleNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleRoleNotFoundException(RoleNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(MESSAGE, ex.getMessage()));
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleUserNotFoundException(UserNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(MESSAGE, ex.getMessage()));
     }
 
