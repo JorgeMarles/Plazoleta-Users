@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -234,5 +235,36 @@ class UserUseCaseTest {
 
         assertEquals(persistedRole, validUser.getRole());
         verify(rolePersistencePort).findById(validRole.getId());
+    }
+
+    @Test
+    void findById_WhenUserExists_ShouldReturnUser() {
+        User user = User.builder()
+                .id(1L)
+                .name("Juan")
+                .surname("Pérez")
+                .email("juan.perez@example.com")
+                .role(validRole)
+                .build();
+
+        when(userPersistencePort.findById(1L)).thenReturn(user);
+
+        User foundUser = userUseCase.findById(1L);
+
+        assertNotNull(foundUser);
+        assertEquals(1L, foundUser.getId());
+        assertEquals("Juan", foundUser.getName());
+        assertEquals("juan.perez@example.com", foundUser.getEmail());
+        verify(userPersistencePort).findById(1L);
+    }
+
+    @Test
+    void findById_WhenUserNotFound_ShouldReturnNull() {
+        when(userPersistencePort.findById(99L)).thenReturn(null);
+
+        User foundUser = userUseCase.findById(99L);
+
+        assertNull(foundUser);
+        verify(userPersistencePort).findById(99L);
     }
 }

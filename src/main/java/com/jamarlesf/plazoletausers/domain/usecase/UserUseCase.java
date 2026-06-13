@@ -42,4 +42,9 @@ public class UserUseCase implements IUserServicePort {
     public List<User> findAll() {
         return userPersistencePort.findAll();
     }
+
+    @Override
+    public User findById(Long id) {
+        return userPersistencePort.findById(id);
+    }
 }

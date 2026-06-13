@@ -10,4 +10,6 @@ public interface IUserPersistencePort {
     boolean existsByEmail(String email);
 
     List<User> findAll();
+
+    User findById(Long id);
 }
