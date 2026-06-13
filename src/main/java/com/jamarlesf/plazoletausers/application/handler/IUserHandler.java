@@ -8,4 +8,5 @@ import java.util.List;
 public interface IUserHandler {
     void saveUser(UserRequestDto user);
     List<UserResponseDto> getUsers();
+    UserResponseDto getUserById(Long id);
 }

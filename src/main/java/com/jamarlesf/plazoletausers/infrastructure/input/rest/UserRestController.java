@@ -9,11 +9,13 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -80,5 +82,31 @@ public class UserRestController {
     @GetMapping()
     public ResponseEntity<List<UserResponseDto>> findAllUsers() {
         return ResponseEntity.ok(userHandler.getUsers());
+    }
+
+    @Operation(
+            summary = "Get user by ID",
+            description = "Retrieves a user by their ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "User retrieved successfully",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE)
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE)
+            )
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponseDto> findUserById(
+            @Parameter(description = "User ID", example = "1")
+            @PathVariable Long id) {
+        UserResponseDto user = userHandler.getUserById(id);
+        return ResponseEntity.ok(user);
     }
 }
