@@ -32,4 +32,9 @@ public class UserHandler implements IUserHandler {
     public List<UserResponseDto> getUsers() {
         return userResponseMapper.toResponseList(userServicePort.findAll());
     }
+
+    @Override
+    public UserResponseDto getUserById(Long id) {
+        return userResponseMapper.toResponse(userServicePort.findById(id));
+    }
 }
