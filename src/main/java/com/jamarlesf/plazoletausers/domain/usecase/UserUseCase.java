@@ -1,6 +1,7 @@
 package com.jamarlesf.plazoletausers.domain.usecase;
 
 import com.jamarlesf.plazoletausers.domain.api.IUserServicePort;
+import com.jamarlesf.plazoletausers.domain.exception.DomainException;
 import com.jamarlesf.plazoletausers.domain.exception.RoleNotFoundException;
 import com.jamarlesf.plazoletausers.domain.exception.UserEmailAlreadyExistsException;
 import com.jamarlesf.plazoletausers.domain.model.Role;
@@ -53,6 +54,13 @@ public class UserUseCase implements IUserServicePort {
 
     @Override
     public String login(String email, String password) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        User user = userPersistencePort.findByEmail(email)
+                .orElseThrow(() -> new DomainException("Correo o contraseña incorrectos"));
+
+        if(!encryptionPort.matches(password, user.getPassword())) {
+            throw new DomainException("Correo o contraseña incorrectos");
+        }
+
+        return tokenProviderPort.generateToken(user);
     }
 }
