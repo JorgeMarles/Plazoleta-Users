@@ -7,7 +7,9 @@ import com.jamarlesf.plazoletausers.domain.model.Role;
 import com.jamarlesf.plazoletausers.domain.model.User;
 import com.jamarlesf.plazoletausers.domain.spi.IEncryptionPort;
 import com.jamarlesf.plazoletausers.domain.spi.IRolePersistencePort;
+import com.jamarlesf.plazoletausers.domain.spi.ITokenProviderPort;
 import com.jamarlesf.plazoletausers.domain.spi.IUserPersistencePort;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +36,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 class UserUseCaseTest {
 
@@ -45,6 +48,9 @@ class UserUseCaseTest {
 
     @Mock
     private IEncryptionPort encryptionPort;
+
+    @Mock
+    private ITokenProviderPort tokenProviderPort;
 
     @InjectMocks
     private UserUseCase userUseCase;
@@ -266,5 +272,43 @@ class UserUseCaseTest {
 
         assertNull(foundUser);
         verify(userPersistencePort).findById(99L);
+    }
+
+    @Test
+    void login_WhenValid_ShouldReturnToken() {
+        String email = validUser.getEmail();
+        String password = validUser.getPassword();
+
+        when(userPersistencePort.findByEmail("juan.perez@example.com")).thenReturn(Optional.of(validUser));
+        when(encryptionPort.matches("plainPassword123", validUser.getPassword())).thenReturn(true);
+        when(tokenProviderPort.generateToken(validUser)).thenReturn(String.valueOf(validUser.getId()));
+
+        String token = userUseCase.login(email, password);
+
+        assertEquals(String.valueOf(validUser.getId()), token);
+    }
+
+    @Test
+    void login_WhenEmailNotFound_ShouldThrowDomainException() {
+        String email = validUser.getEmail();
+        String password = validUser.getPassword();
+
+        when(userPersistencePort.findByEmail("juan.perez@example.com")).thenReturn(Optional.empty());
+
+        DomainException exception = assertThrows(DomainException.class, () -> userUseCase.login(email, password));
+        assertEquals("Correo o contraseña incorrectos", exception.getMessage());
+    }
+
+    @Test
+    void login_WhenInvalidPassword_ShouldThrowDomainException() {
+        String email = validUser.getEmail();
+        String password = "plainPassword1234";
+
+        when(userPersistencePort.findByEmail("juan.perez@example.com")).thenReturn(Optional.of(validUser));
+        when(encryptionPort.matches("plainPassword1234", validUser.getPassword())).thenReturn(false);
+
+
+        DomainException exception = assertThrows(DomainException.class, () -> userUseCase.login(email, password));
+        assertEquals("Correo o contraseña incorrectos", exception.getMessage());
     }
 }
