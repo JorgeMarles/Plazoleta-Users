@@ -8,7 +8,7 @@ import com.jamarlesf.plazoletausers.application.dto.response.UserResponseDto;
 import java.util.List;
 
 public interface IUserHandler {
-    void saveUser(UserRequestDto user);
+    void saveUser(UserRequestDto user, String requestUserRole);
     List<UserResponseDto> getUsers();
     UserResponseDto getUserById(Long id);
     TokenResponseDto login(LoginRequestDto loginRequestDto);
