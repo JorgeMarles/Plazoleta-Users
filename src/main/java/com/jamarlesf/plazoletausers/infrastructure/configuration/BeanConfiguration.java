@@ -4,6 +4,7 @@ import com.jamarlesf.plazoletausers.domain.api.IUserServicePort;
 import com.jamarlesf.plazoletausers.domain.spi.IEncryptionPort;
 import com.jamarlesf.plazoletausers.domain.spi.IRolePersistencePort;
 import com.jamarlesf.plazoletausers.domain.spi.IUserPersistencePort;
+import com.jamarlesf.plazoletausers.domain.spi.ITokenProviderPort;
 import com.jamarlesf.plazoletausers.domain.usecase.UserUseCase;
 import com.jamarlesf.plazoletausers.infrastructure.out.jpa.adapter.RoleJpaAdapter;
 import com.jamarlesf.plazoletausers.infrastructure.out.jpa.adapter.UserJpaAdapter;
@@ -25,6 +26,7 @@ public class BeanConfiguration {
     private final IRoleEntityMapper roleEntityMapper;
 
     private final IEncryptionPort encryptionPort;
+    private final ITokenProviderPort tokenProviderPort;
 
     @Bean
     public IUserPersistencePort userPersistencePort() {
@@ -38,6 +40,6 @@ public class BeanConfiguration {
 
     @Bean
     public IUserServicePort userServicePort() {
-        return new UserUseCase(userPersistencePort(), rolePersistencePort(), encryptionPort);
+        return new UserUseCase(userPersistencePort(), rolePersistencePort(), encryptionPort, tokenProviderPort);
     }
 }
