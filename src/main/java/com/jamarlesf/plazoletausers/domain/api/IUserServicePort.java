@@ -5,7 +5,7 @@ import com.jamarlesf.plazoletausers.domain.model.User;
 import java.util.List;
 
 public interface IUserServicePort {
-    void save(User user);
+    void save(User user, String requestUserRole);
     List<User> findAll();
     User findById(Long id);
     String login(String email, String password);

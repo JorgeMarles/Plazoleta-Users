@@ -20,6 +20,7 @@ public class UserUseCase implements IUserServicePort {
     private final IEncryptionPort encryptionPort;
     private final ITokenProviderPort tokenProviderPort;
 
+
     public UserUseCase(IUserPersistencePort userPersistencePort, IRolePersistencePort rolePersistencePort, IEncryptionPort encryptionPort, ITokenProviderPort tokenProviderPort) {
         this.userPersistencePort = userPersistencePort;
         this.rolePersistencePort = rolePersistencePort;
@@ -28,7 +29,7 @@ public class UserUseCase implements IUserServicePort {
     }
 
     @Override
-    public void save(User user) {
+    public void save(User user, String requestUserRole) {
         user.validate();
         if (userPersistencePort.existsByEmail(user.getEmail())) {
             throw new UserEmailAlreadyExistsException();
@@ -36,6 +37,14 @@ public class UserUseCase implements IUserServicePort {
         Role role = rolePersistencePort.findById(
                 user.getRole().getId()).orElseThrow(
                 () -> new RoleNotFoundException(user.getRole().getId()));
+
+        if(Role.PROPIETARIO.equals(role.getName()) && !Role.ADMINISTRADOR.equals(requestUserRole)) {
+            throw new DomainException("No tiene los permisos para realizar esta acción");
+        }
+
+        if(Role.EMPLEADO.equals(role.getName()) && !Role.PROPIETARIO.equals(requestUserRole)) {
+            throw new DomainException("No tiene los permisos para realizar esta acción");
+        }
 
         user.setRole(role);
         user.setPassword(encryptionPort.encryptPassword(user.getPassword()));
