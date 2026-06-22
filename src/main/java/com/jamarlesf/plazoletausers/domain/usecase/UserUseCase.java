@@ -7,6 +7,7 @@ import com.jamarlesf.plazoletausers.domain.model.Role;
 import com.jamarlesf.plazoletausers.domain.model.User;
 import com.jamarlesf.plazoletausers.domain.spi.IEncryptionPort;
 import com.jamarlesf.plazoletausers.domain.spi.IRolePersistencePort;
+import com.jamarlesf.plazoletausers.domain.spi.ITokenProviderPort;
 import com.jamarlesf.plazoletausers.domain.spi.IUserPersistencePort;
 
 import java.util.List;
@@ -16,11 +17,13 @@ public class UserUseCase implements IUserServicePort {
     private final IUserPersistencePort userPersistencePort;
     private final IRolePersistencePort rolePersistencePort;
     private final IEncryptionPort encryptionPort;
+    private final ITokenProviderPort tokenProviderPort;
 
-    public UserUseCase(IUserPersistencePort userPersistencePort, IRolePersistencePort rolePersistencePort, IEncryptionPort encryptionPort) {
+    public UserUseCase(IUserPersistencePort userPersistencePort, IRolePersistencePort rolePersistencePort, IEncryptionPort encryptionPort, ITokenProviderPort tokenProviderPort) {
         this.userPersistencePort = userPersistencePort;
         this.rolePersistencePort = rolePersistencePort;
         this.encryptionPort = encryptionPort;
+        this.tokenProviderPort = tokenProviderPort;
     }
 
     @Override
@@ -46,5 +49,10 @@ public class UserUseCase implements IUserServicePort {
     @Override
     public User findById(Long id) {
         return userPersistencePort.findById(id);
+    }
+
+    @Override
+    public String login(String email, String password) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

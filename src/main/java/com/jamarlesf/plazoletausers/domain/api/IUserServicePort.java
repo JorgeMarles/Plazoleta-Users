@@ -8,4 +8,5 @@ public interface IUserServicePort {
     void save(User user);
     List<User> findAll();
     User findById(Long id);
+    String login(String email, String password);
 }
