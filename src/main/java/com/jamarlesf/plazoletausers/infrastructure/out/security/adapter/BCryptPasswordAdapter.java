@@ -20,4 +20,9 @@ public class BCryptPasswordAdapter implements IEncryptionPort {
         }
         return passwordEncoder.encode(password);
     }
+
+    @Override
+    public boolean matches(String password, String encryptedPassword) {
+        return passwordEncoder.matches(password, encryptedPassword);
+    }
 }

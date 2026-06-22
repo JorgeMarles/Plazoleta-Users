@@ -7,7 +7,9 @@ import com.jamarlesf.plazoletausers.domain.model.Role;
 import com.jamarlesf.plazoletausers.domain.model.User;
 import com.jamarlesf.plazoletausers.domain.spi.IEncryptionPort;
 import com.jamarlesf.plazoletausers.domain.spi.IRolePersistencePort;
+import com.jamarlesf.plazoletausers.domain.spi.ITokenProviderPort;
 import com.jamarlesf.plazoletausers.domain.spi.IUserPersistencePort;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +36,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 class UserUseCaseTest {
 
@@ -45,6 +48,9 @@ class UserUseCaseTest {
 
     @Mock
     private IEncryptionPort encryptionPort;
+
+    @Mock
+    private ITokenProviderPort tokenProviderPort;
 
     @InjectMocks
     private UserUseCase userUseCase;
@@ -74,7 +80,7 @@ class UserUseCaseTest {
         when(rolePersistencePort.findById(anyLong())).thenReturn(Optional.of(validRole));
         when(encryptionPort.encryptPassword(anyString())).thenReturn("encryptedPassword");
 
-        userUseCase.save(validUser);
+        userUseCase.save(validUser, Role.ADMINISTRADOR);
 
         verify(userPersistencePort).existsByEmail(validUser.getEmail());
         verify(rolePersistencePort).findById(validRole.getId());
@@ -88,7 +94,7 @@ class UserUseCaseTest {
     void save_WhenEmailAlreadyExists_ShouldThrowUserEmailAlreadyExistsException() {
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(true);
 
-        assertThrows(UserEmailAlreadyExistsException.class, () -> userUseCase.save(validUser));
+        assertThrows(UserEmailAlreadyExistsException.class, () -> userUseCase.save(validUser, Role.ADMINISTRADOR));
 
         verify(userPersistencePort).existsByEmail(validUser.getEmail());
         verify(rolePersistencePort, never()).findById(anyLong());
@@ -101,7 +107,7 @@ class UserUseCaseTest {
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(rolePersistencePort.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(RoleNotFoundException.class, () -> userUseCase.save(validUser));
+        assertThrows(RoleNotFoundException.class, () -> userUseCase.save(validUser, Role.ADMINISTRADOR));
 
         verify(userPersistencePort).existsByEmail(validUser.getEmail());
         verify(rolePersistencePort).findById(validRole.getId());
@@ -141,7 +147,7 @@ class UserUseCaseTest {
                 .role(validRole)
                 .build();
 
-        assertThrows(DomainException.class, () -> userUseCase.save(invalidUser));
+        assertThrows(DomainException.class, () -> userUseCase.save(invalidUser, Role.ADMINISTRADOR));
 
         verify(userPersistencePort, never()).existsByEmail(anyString());
         verify(rolePersistencePort, never()).findById(anyLong());
@@ -162,7 +168,7 @@ class UserUseCaseTest {
                 .role(validRole)
                 .build();
 
-        assertThrows(DomainException.class, () -> userUseCase.save(minorUser));
+        assertThrows(DomainException.class, () -> userUseCase.save(minorUser, Role.ADMINISTRADOR));
 
         verify(userPersistencePort, never()).existsByEmail(anyString());
         verify(rolePersistencePort, never()).findById(anyLong());
@@ -217,7 +223,7 @@ class UserUseCaseTest {
         when(rolePersistencePort.findById(anyLong())).thenReturn(Optional.of(validRole));
         when(encryptionPort.encryptPassword(plainPassword)).thenReturn(encryptedPassword);
 
-        userUseCase.save(validUser);
+        userUseCase.save(validUser, Role.ADMINISTRADOR);
 
         verify(encryptionPort).encryptPassword(plainPassword);
         assertEquals(encryptedPassword, validUser.getPassword());
@@ -231,7 +237,7 @@ class UserUseCaseTest {
         when(rolePersistencePort.findById(anyLong())).thenReturn(Optional.of(persistedRole));
         when(encryptionPort.encryptPassword(anyString())).thenReturn("encryptedPassword");
 
-        userUseCase.save(validUser);
+        userUseCase.save(validUser, Role.ADMINISTRADOR);
 
         assertEquals(persistedRole, validUser.getRole());
         verify(rolePersistencePort).findById(validRole.getId());
@@ -266,5 +272,103 @@ class UserUseCaseTest {
 
         assertNull(foundUser);
         verify(userPersistencePort).findById(99L);
+    }
+
+    @Test
+    void login_WhenValid_ShouldReturnToken() {
+        String email = validUser.getEmail();
+        String password = validUser.getPassword();
+
+        when(userPersistencePort.findByEmail("juan.perez@example.com")).thenReturn(Optional.of(validUser));
+        when(encryptionPort.matches("plainPassword123", validUser.getPassword())).thenReturn(true);
+        when(tokenProviderPort.generateToken(validUser)).thenReturn(String.valueOf(validUser.getId()));
+
+        String token = userUseCase.login(email, password);
+
+        assertEquals(String.valueOf(validUser.getId()), token);
+    }
+
+    @Test
+    void login_WhenEmailNotFound_ShouldThrowDomainException() {
+        String email = validUser.getEmail();
+        String password = validUser.getPassword();
+
+        when(userPersistencePort.findByEmail("juan.perez@example.com")).thenReturn(Optional.empty());
+
+        DomainException exception = assertThrows(DomainException.class, () -> userUseCase.login(email, password));
+        assertEquals("Correo o contraseña incorrectos", exception.getMessage());
+    }
+
+    @Test
+    void login_WhenInvalidPassword_ShouldThrowDomainException() {
+        String email = validUser.getEmail();
+        String password = "plainPassword1234";
+
+        when(userPersistencePort.findByEmail("juan.perez@example.com")).thenReturn(Optional.of(validUser));
+        when(encryptionPort.matches("plainPassword1234", validUser.getPassword())).thenReturn(false);
+
+
+        DomainException exception = assertThrows(DomainException.class, () -> userUseCase.login(email, password));
+        assertEquals("Correo o contraseña incorrectos", exception.getMessage());
+    }
+
+    @Test
+    void save_AsNonAdminCreatingPropietario_ShouldThrowDomainException() {
+        when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
+        when(rolePersistencePort.findById(anyLong())).thenReturn(Optional.of(validRole)); // validRole is PROPIETARIO
+
+        DomainException exception = assertThrows(DomainException.class, 
+                () -> userUseCase.save(validUser, Role.EMPLEADO));
+
+        assertEquals("No tiene los permisos para realizar esta acción", exception.getMessage());
+        verify(userPersistencePort, never()).save(any(User.class));
+    }
+
+    @Test
+    void save_AsPropietarioCreatingEmpleado_ShouldSaveSuccessfully() {
+        Role empleadoRole = new Role(2L, Role.EMPLEADO, "Empleado");
+        User empleadoUser = User.builder()
+                .name("Pedro")
+                .surname("Gómez")
+                .documentId("0987654321")
+                .phone("+573007654321")
+                .birthDate(LocalDate.of(1995, 1, 1))
+                .email("pedro.gomez@example.com")
+                .password("plainPassword123")
+                .role(empleadoRole)
+                .build();
+
+        when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
+        when(rolePersistencePort.findById(anyLong())).thenReturn(Optional.of(empleadoRole));
+        when(encryptionPort.encryptPassword(anyString())).thenReturn("encryptedPassword");
+
+        userUseCase.save(empleadoUser, Role.PROPIETARIO);
+
+        verify(userPersistencePort).save(empleadoUser);
+        assertEquals(empleadoRole, empleadoUser.getRole());
+    }
+
+    @Test
+    void save_AsNonPropietarioCreatingEmpleado_ShouldThrowDomainException() {
+        Role empleadoRole = new Role(2L, Role.EMPLEADO, "Empleado");
+        User empleadoUser = User.builder()
+                .name("Pedro")
+                .surname("Gómez")
+                .documentId("0987654321")
+                .phone("+573007654321")
+                .birthDate(LocalDate.of(1995, 1, 1))
+                .email("pedro.gomez@example.com")
+                .password("plainPassword123")
+                .role(empleadoRole)
+                .build();
+
+        when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
+        when(rolePersistencePort.findById(anyLong())).thenReturn(Optional.of(empleadoRole));
+
+        DomainException exception = assertThrows(DomainException.class, 
+                () -> userUseCase.save(empleadoUser, Role.ADMINISTRADOR));
+
+        assertEquals("No tiene los permisos para realizar esta acción", exception.getMessage());
+        verify(userPersistencePort, never()).save(any(User.class));
     }
 }

@@ -1,6 +1,8 @@
 package com.jamarlesf.plazoletausers.infrastructure.input.rest;
 
+import com.jamarlesf.plazoletausers.application.dto.request.LoginRequestDto;
 import com.jamarlesf.plazoletausers.application.dto.request.UserRequestDto;
+import com.jamarlesf.plazoletausers.application.dto.response.TokenResponseDto;
 import com.jamarlesf.plazoletausers.application.dto.response.UserResponseDto;
 import com.jamarlesf.plazoletausers.application.handler.IUserHandler;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,6 +16,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -61,9 +67,17 @@ public class UserRestController {
                     )
             )
     })
+    @PreAuthorize("hasAnyAuthority({'ADMINISTRADOR', 'PROPIETARIO'})")
     @PostMapping()
     public ResponseEntity<Void> createUser(@RequestBody UserRequestDto user) {
-        userHandler.saveUser(user);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        String currentRole = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .findFirst()
+                .orElse(null);
+
+        userHandler.saveUser(user, currentRole);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -79,6 +93,7 @@ public class UserRestController {
                             mediaType = MediaType.APPLICATION_JSON_VALUE)
             )
     })
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     @GetMapping()
     public ResponseEntity<List<UserResponseDto>> findAllUsers() {
         return ResponseEntity.ok(userHandler.getUsers());
@@ -108,5 +123,28 @@ public class UserRestController {
             @PathVariable Long id) {
         UserResponseDto user = userHandler.getUserById(id);
         return ResponseEntity.ok(user);
+    }
+
+    @Operation(
+            summary = "Login user",
+            description = "Authenticates a user and returns a JWT token"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Login successful, token returned",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE)
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid credentials",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE)
+            )
+    })
+    @PostMapping("/login")
+    public ResponseEntity<TokenResponseDto> login(@RequestBody LoginRequestDto loginRequestDto) {
+        return ResponseEntity.ok(userHandler.login(loginRequestDto));
     }
 }

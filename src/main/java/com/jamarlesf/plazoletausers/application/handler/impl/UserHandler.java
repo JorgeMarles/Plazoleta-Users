@@ -1,6 +1,8 @@
 package com.jamarlesf.plazoletausers.application.handler.impl;
 
+import com.jamarlesf.plazoletausers.application.dto.request.LoginRequestDto;
 import com.jamarlesf.plazoletausers.application.dto.request.UserRequestDto;
+import com.jamarlesf.plazoletausers.application.dto.response.TokenResponseDto;
 import com.jamarlesf.plazoletausers.application.dto.response.UserResponseDto;
 import com.jamarlesf.plazoletausers.application.handler.IUserHandler;
 import com.jamarlesf.plazoletausers.application.mapper.IUserRequestMapper;
@@ -23,9 +25,9 @@ public class UserHandler implements IUserHandler {
     private final IUserResponseMapper userResponseMapper;
 
     @Override
-    public void saveUser(UserRequestDto userRequestDto) {
+    public void saveUser(UserRequestDto userRequestDto, String requestUserRole) {
         User user = userRequestMapper.toUser(userRequestDto);
-        userServicePort.save(user);
+        userServicePort.save(user, requestUserRole);
     }
 
     @Override
@@ -36,5 +38,10 @@ public class UserHandler implements IUserHandler {
     @Override
     public UserResponseDto getUserById(Long id) {
         return userResponseMapper.toResponse(userServicePort.findById(id));
+    }
+
+    @Override
+    public TokenResponseDto login(LoginRequestDto loginRequestDto) {
+        return new TokenResponseDto(userServicePort.login(loginRequestDto.getEmail(), loginRequestDto.getPassword()));
     }
 }

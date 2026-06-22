@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: plazoletausers
 
@@ -23,6 +25,11 @@ server:
   error:
     include-message: always
     include-binding-errors: always
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+
 
 logging:
   level:
