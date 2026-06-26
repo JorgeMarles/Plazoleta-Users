@@ -47,7 +47,9 @@ public class User {
         validateEmail(this.email);
         validatePhone(this.phone);
         validateDocumentId(this.documentId);
-        validateAdult(this.birthDate, clock);
+        if(Role.PROPIETARIO.equals(this.role.getName())) {
+            validateAdult(this.birthDate, clock);
+        }
     }
 
     public void validate() {
