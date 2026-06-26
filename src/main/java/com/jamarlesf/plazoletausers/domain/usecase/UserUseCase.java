@@ -30,10 +30,6 @@ public class UserUseCase implements IUserServicePort {
 
     @Override
     public void save(User user, String requestUserRole) {
-        user.validate();
-        if (userPersistencePort.existsByEmail(user.getEmail())) {
-            throw new UserEmailAlreadyExistsException();
-        }
         Role role = rolePersistencePort.findById(
                 user.getRole().getId()).orElseThrow(
                 () -> new RoleNotFoundException(user.getRole().getId()));
@@ -41,12 +37,16 @@ public class UserUseCase implements IUserServicePort {
         if(Role.PROPIETARIO.equals(role.getName()) && !Role.ADMINISTRADOR.equals(requestUserRole)) {
             throw new DomainException("No tiene los permisos para realizar esta acción");
         }
-
         if(Role.EMPLEADO.equals(role.getName()) && !Role.PROPIETARIO.equals(requestUserRole)) {
             throw new DomainException("No tiene los permisos para realizar esta acción");
         }
-
         user.setRole(role);
+        user.validate();
+        if (userPersistencePort.existsByEmail(user.getEmail())) {
+            throw new UserEmailAlreadyExistsException();
+        }
+
+
         user.setPassword(encryptionPort.encryptPassword(user.getPassword()));
         userPersistencePort.save(user);
     }
