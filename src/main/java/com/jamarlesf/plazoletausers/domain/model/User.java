@@ -43,10 +43,31 @@ public class User {
             throw new DomainException("El usuario debe ser mayor de edad");
     }
 
+    private void validateName(String name) {
+        if(name == null || name.isEmpty()) {
+            throw new DomainException("El nombre del usuario no puede estar vacio");
+        }
+    }
+
+    private void validateSurname(String surname) {
+        if(surname == null || surname.isEmpty()) {
+            throw new DomainException("El apellido del usuario no puede estar vacio");
+        }
+    }
+
+    private void validatePassword(String password) {
+        if(password == null || password.isEmpty()) {
+            throw new DomainException("La contraseña no puede estar vacia");
+        }
+    }
+
     public void validate(Clock clock) {
+        validateName(this.name);
+        validateSurname(this.surname);
         validateEmail(this.email);
         validatePhone(this.phone);
         validateDocumentId(this.documentId);
+        validatePassword(this.password);
         if(Role.PROPIETARIO.equals(this.role.getName())) {
             validateAdult(this.birthDate, clock);
         }
