@@ -1,5 +1,6 @@
 package com.jamarlesf.plazoletausers.infrastructure.input.rest;
 
+import com.jamarlesf.plazoletausers.application.dto.request.ClientRequestDto;
 import com.jamarlesf.plazoletausers.application.dto.request.LoginRequestDto;
 import com.jamarlesf.plazoletausers.application.dto.request.UserRequestDto;
 import com.jamarlesf.plazoletausers.application.dto.response.TokenResponseDto;
@@ -78,6 +79,32 @@ public class UserRestController {
                 .orElse(null);
 
         userHandler.saveUser(user, currentRole);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @Operation(
+            summary = "Create a new client",
+            description = "Creates a new client (anonymous registration)"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Client created successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Email already exists",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            examples = @ExampleObject(
+                                    value = "{\"message\": \"User email already exists\"}"
+                            )
+                    )
+            )
+    })
+    @PostMapping("/clients")
+    public ResponseEntity<Void> createClient(@RequestBody ClientRequestDto user) {
+        userHandler.saveClient(user);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

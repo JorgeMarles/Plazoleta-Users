@@ -52,6 +52,22 @@ public class UserUseCase implements IUserServicePort {
     }
 
     @Override
+    public void registerClient(User user) {
+        Role role = rolePersistencePort.findById(4L).orElseThrow(
+                () -> new RoleNotFoundException(4L));
+
+        user.setRole(role);
+        user.validate();
+
+        if (userPersistencePort.existsByEmail(user.getEmail())) {
+            throw new UserEmailAlreadyExistsException();
+        }
+
+        user.setPassword(encryptionPort.encryptPassword(user.getPassword()));
+        userPersistencePort.save(user);
+    }
+
+    @Override
     public List<User> findAll() {
         return userPersistencePort.findAll();
     }
