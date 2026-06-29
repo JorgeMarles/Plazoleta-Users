@@ -92,25 +92,25 @@ class UserUseCaseTest {
 
     @Test
     void save_WhenEmailAlreadyExists_ShouldThrowUserEmailAlreadyExistsException() {
+        when(rolePersistencePort.findById(anyLong())).thenReturn(Optional.of(validRole));
         when(userPersistencePort.existsByEmail(anyString())).thenReturn(true);
 
         assertThrows(UserEmailAlreadyExistsException.class, () -> userUseCase.save(validUser, Role.ADMINISTRADOR));
 
+        verify(rolePersistencePort).findById(validRole.getId());
         verify(userPersistencePort).existsByEmail(validUser.getEmail());
-        verify(rolePersistencePort, never()).findById(anyLong());
         verify(encryptionPort, never()).encryptPassword(anyString());
         verify(userPersistencePort, never()).save(any(User.class));
     }
 
     @Test
     void save_WhenRoleNotFound_ShouldThrowRoleNotFoundException() {
-        when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(rolePersistencePort.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(RoleNotFoundException.class, () -> userUseCase.save(validUser, Role.ADMINISTRADOR));
 
-        verify(userPersistencePort).existsByEmail(validUser.getEmail());
         verify(rolePersistencePort).findById(validRole.getId());
+        verify(userPersistencePort, never()).existsByEmail(anyString());
         verify(encryptionPort, never()).encryptPassword(anyString());
         verify(userPersistencePort, never()).save(any(User.class));
     }
@@ -147,10 +147,12 @@ class UserUseCaseTest {
                 .role(validRole)
                 .build();
 
+        when(rolePersistencePort.findById(anyLong())).thenReturn(Optional.of(validRole));
+
         assertThrows(DomainException.class, () -> userUseCase.save(invalidUser, Role.ADMINISTRADOR));
 
+        verify(rolePersistencePort).findById(anyLong());
         verify(userPersistencePort, never()).existsByEmail(anyString());
-        verify(rolePersistencePort, never()).findById(anyLong());
         verify(encryptionPort, never()).encryptPassword(anyString());
         verify(userPersistencePort, never()).save(any(User.class));
     }
@@ -168,10 +170,12 @@ class UserUseCaseTest {
                 .role(validRole)
                 .build();
 
+        when(rolePersistencePort.findById(anyLong())).thenReturn(Optional.of(validRole));
+
         assertThrows(DomainException.class, () -> userUseCase.save(minorUser, Role.ADMINISTRADOR));
 
+        verify(rolePersistencePort).findById(anyLong());
         verify(userPersistencePort, never()).existsByEmail(anyString());
-        verify(rolePersistencePort, never()).findById(anyLong());
         verify(encryptionPort, never()).encryptPassword(anyString());
         verify(userPersistencePort, never()).save(any(User.class));
     }
@@ -314,13 +318,14 @@ class UserUseCaseTest {
 
     @Test
     void save_AsNonAdminCreatingPropietario_ShouldThrowDomainException() {
-        when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(rolePersistencePort.findById(anyLong())).thenReturn(Optional.of(validRole)); // validRole is PROPIETARIO
 
         DomainException exception = assertThrows(DomainException.class, 
                 () -> userUseCase.save(validUser, Role.EMPLEADO));
 
         assertEquals("No tiene los permisos para realizar esta acción", exception.getMessage());
+        verify(rolePersistencePort).findById(anyLong());
+        verify(userPersistencePort, never()).existsByEmail(anyString());
         verify(userPersistencePort, never()).save(any(User.class));
     }
 
@@ -360,13 +365,84 @@ class UserUseCaseTest {
                 .role(empleadoRole)
                 .build();
 
-        when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
         when(rolePersistencePort.findById(anyLong())).thenReturn(Optional.of(empleadoRole));
 
         DomainException exception = assertThrows(DomainException.class, 
                 () -> userUseCase.save(empleadoUser, Role.ADMINISTRADOR));
 
         assertEquals("No tiene los permisos para realizar esta acción", exception.getMessage());
+        verify(rolePersistencePort).findById(anyLong());
+        verify(userPersistencePort, never()).existsByEmail(anyString());
+        verify(userPersistencePort, never()).save(any(User.class));
+    }
+
+    @Test
+    void registerClient_WhenValidUser_ShouldSaveSuccessfully() {
+        Role clientRole = new Role(4L, Role.CLIENTE, "Cliente");
+        User clientUser = User.builder()
+                .name("Ana")
+                .surname("Martinez")
+                .documentId("1122334455")
+                .phone("+573009998877")
+                .email("ana.martinez@example.com")
+                .password("plainPassword123")
+                .build();
+
+        when(rolePersistencePort.findById(4L)).thenReturn(Optional.of(clientRole));
+        when(userPersistencePort.existsByEmail(anyString())).thenReturn(false);
+        when(encryptionPort.encryptPassword(anyString())).thenReturn("encryptedPassword");
+
+        userUseCase.registerClient(clientUser);
+
+        verify(rolePersistencePort).findById(4L);
+        verify(userPersistencePort).existsByEmail(clientUser.getEmail());
+        verify(encryptionPort).encryptPassword("plainPassword123");
+        verify(userPersistencePort).save(clientUser);
+        assertEquals("encryptedPassword", clientUser.getPassword());
+        assertEquals(clientRole, clientUser.getRole());
+    }
+
+    @Test
+    void registerClient_WhenEmailAlreadyExists_ShouldThrowException() {
+        Role clientRole = new Role(4L, Role.CLIENTE, "Cliente");
+        User clientUser = User.builder()
+                .name("Ana")
+                .surname("Martinez")
+                .documentId("1122334455")
+                .phone("+573009998877")
+                .email("ana.martinez@example.com")
+                .password("plainPassword123")
+                .build();
+
+        when(rolePersistencePort.findById(4L)).thenReturn(Optional.of(clientRole));
+        when(userPersistencePort.existsByEmail(anyString())).thenReturn(true);
+
+        assertThrows(UserEmailAlreadyExistsException.class, () -> userUseCase.registerClient(clientUser));
+
+        verify(rolePersistencePort).findById(4L);
+        verify(userPersistencePort).existsByEmail(clientUser.getEmail());
+        verify(encryptionPort, never()).encryptPassword(anyString());
+        verify(userPersistencePort, never()).save(any(User.class));
+    }
+
+    @Test
+    void registerClient_WhenRoleNotFound_ShouldThrowException() {
+        User clientUser = User.builder()
+                .name("Ana")
+                .surname("Martinez")
+                .documentId("1122334455")
+                .phone("+573009998877")
+                .email("ana.martinez@example.com")
+                .password("plainPassword123")
+                .build();
+
+        when(rolePersistencePort.findById(4L)).thenReturn(Optional.empty());
+
+        assertThrows(RoleNotFoundException.class, () -> userUseCase.registerClient(clientUser));
+
+        verify(rolePersistencePort).findById(4L);
+        verify(userPersistencePort, never()).existsByEmail(anyString());
+        verify(encryptionPort, never()).encryptPassword(anyString());
         verify(userPersistencePort, never()).save(any(User.class));
     }
 }
