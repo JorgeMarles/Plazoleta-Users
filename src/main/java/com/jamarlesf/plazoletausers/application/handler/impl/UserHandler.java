@@ -1,5 +1,6 @@
 package com.jamarlesf.plazoletausers.application.handler.impl;
 
+import com.jamarlesf.plazoletausers.application.dto.request.ClientRequestDto;
 import com.jamarlesf.plazoletausers.application.dto.request.LoginRequestDto;
 import com.jamarlesf.plazoletausers.application.dto.request.UserRequestDto;
 import com.jamarlesf.plazoletausers.application.dto.response.TokenResponseDto;
@@ -28,6 +29,12 @@ public class UserHandler implements IUserHandler {
     public void saveUser(UserRequestDto userRequestDto, String requestUserRole) {
         User user = userRequestMapper.toUser(userRequestDto);
         userServicePort.save(user, requestUserRole);
+    }
+
+    @Override
+    public void saveClient(ClientRequestDto clientRequestDto) {
+        User user = userRequestMapper.toUser(clientRequestDto);
+        userServicePort.registerClient(user);
     }
 
     @Override
