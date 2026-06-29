@@ -52,6 +52,11 @@ public class UserUseCase implements IUserServicePort {
     }
 
     @Override
+    public void registerClient(User user) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
     public List<User> findAll() {
         return userPersistencePort.findAll();
     }
